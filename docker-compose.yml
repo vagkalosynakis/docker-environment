@@ -1,0 +1,49 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    image: php:8.3.7-fpm-alpine3.19
+    container_name: interactive-map-app
+    volumes:
+      - app_data:/var/www/html
+      # - ./src/.env:/var/www/html/.env
+    networks:
+      - interactive-map
+    depends_on:
+      - db
+
+  nginx:
+    build:
+      context: docker/nginx
+      dockerfile: Dockerfile
+    ports:
+      - 3000:80
+      - 3001:443
+    image: nginx:1.26.0-alpine3.19-slim
+    networks:
+      - interactive-map
+    depends_on:
+      - app
+
+  db:
+    image: mysql:8.0.37
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: interactive-map
+      MYSQL_USER: intmap
+      MYSQL_PASSWORD: intmap
+    ports:
+      - 3002:3306
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - interactive-map
+
+networks:
+  interactive-map:
+    driver: bridge
+volumes:
+  app_data:
+  db_data:
