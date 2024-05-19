@@ -9,6 +9,7 @@ services:
     container_name: ${PROJECT_NAME}
     volumes:
       - app_data:/var/www/html
+      - ./src/index.php:/var/www/html/public/index.php
     networks:
       - network
     depends_on:
